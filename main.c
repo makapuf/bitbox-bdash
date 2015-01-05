@@ -72,20 +72,12 @@ void start_level(int l)
 void game_init() {
 	blitter_init();
 	bg = tilemap_new(bdash_tset, lvl_w*32, lvl_h*32, bdash_header, &vram);
-	clock = sprite_new((uint32_t*)&clock_spr);
-	clock->x = 10;
-	clock->y = 10;
-	clock->z = -1;
+	clock = sprite_new((uint32_t*)&clock_spr, 10, 10, -1);
 
-	diams = sprite_new((uint32_t*)&diams_spr);
-	diams->x = 50;
-	diams->y = 10;
-	diams->z = -1;
+	diams = sprite_new((uint32_t*)&diams_spr, 50, 10, -1);
 
-	rock = sprite_new((uint32_t*)&rock_spr);
+	rock = sprite_new((uint32_t*)&rock_spr, 0, 0, -1);
 	rock->z = -1;
-
-    audio_on=1;
 
 	start_level(bdash_start);
 }
