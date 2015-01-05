@@ -186,13 +186,14 @@ void handle_rockford(int pos)
 				case bdash_diamond+32 : 
 				case bdash_diamond+48 : 
 					diamonds += 1;
-					play_mono_from_memory(snd_diam_raw, snd_diam_raw_len,40,40);
+					play_sample(snd_diam_raw, snd_diam_raw_len, 256, -1,40,40);
+				
 					vram[pos+v[i][1]] = v[i][2];
 					vram[pos] = bdash_empty;
 					break;
 
 				case bdash_soil : 
-					play_mono_from_memory(snd_dig1_raw, snd_dig1_raw_len,40,40);
+					play_sample(snd_dig1_raw, snd_dig1_raw_len, 256, -1,40,40);
 					vram[pos+v[i][1]] = v[i][2];
 					vram[pos] = bdash_empty;
 					break;
@@ -273,9 +274,12 @@ void game_frame()
 {
 	kbd_emulate_gamepad();
 	gamepad_pressed = gamepad_buttons[0] & ~old_gamepad;
-	static int snd_handle;
+	static int snd_handle = -1;
 
 	if (level==bdash_start) {
+		if (snd_handle<0) // launch looping sample
+			snd_handle = play_sample(snd_music1_raw, snd_music1_raw_len,250,0, 200,200);
+
 		vram[lvl_w*6+10]=bdash_rockford_idle+((vga_frame-32)/16)%4*16;
 		int fr=((vga_frame-32)/8)%16-12;
 		vram[lvl_w*6+11]=bdash_diamond+(fr<0?0:fr)*16;
@@ -285,10 +289,6 @@ void game_frame()
 			rock->y  = 300;
 			rock->fr = (vga_frame/4)%8;
 		}	
-
-		if (vga_frame%481==0) {
-			snd_handle = play_mono_from_memory(snd_music1_raw, snd_music1_raw_len, 200,200);
-		}
 
 
 		if (gamepad_pressed & (gamepad_A | gamepad_start)) {
