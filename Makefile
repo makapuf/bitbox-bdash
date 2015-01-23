@@ -12,7 +12,7 @@ NO_SDCARD=1
 include $(BITBOX)/lib/bitbox.mk
 main.c:bdash.h
 
-bdash.h: bdash.tmx bdash.png 
+bdash.h bdash.tset bdash.tmap: bdash.tmx bdash.png 
 	python $(BITBOX)/scripts/tmx.py bdash.tmx > bdash.h
 
 clock.spr: $(wildcard clock_xcf-??.png)
@@ -28,3 +28,6 @@ rock.spr: $(wildcard rock/????.png)
 
 snd/%.raw: snd/%.wav	
 	sox $^ -r 30k -c 1 -b 8 --encoding signed-integer $@
+
+clean::
+	rm -f bdash.h *.tmap *.tset *.spr *.spr.png

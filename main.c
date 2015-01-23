@@ -9,10 +9,8 @@ affiche
 decalage bg changement ecran
 load levels
 
-son - vite ! (changer FS ds sampler)
 start level sound 'warp)'
 
-icon
 fireflies
 (blob?)
 level design
