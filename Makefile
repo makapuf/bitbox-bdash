@@ -7,8 +7,6 @@ GAME_BINARY_FILES = bdash.tset bdash.tmap clock.spr diams.spr rock.spr $(wildcar
 USE_ENGINE=1
 USE_SAMPLER=1
 
-NO_SDCARD=1
-
 include $(BITBOX)/lib/bitbox.mk
 main.c:bdash.h
 
