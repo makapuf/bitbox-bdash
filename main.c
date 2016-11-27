@@ -21,15 +21,17 @@ bomb
 
 */
 
-#include <bitbox.h>
-#include <blitter.h>
 #include <string.h>
-#include <sampler.h>
+#include <bitbox.h>
+#include "lib/blitter/blitter.h"
+#include "lib/chiptune/chiptune.h"
 
 #include "bdash.h"
 
 #define lvl_w 128
 #define lvl_h 64
+
+extern struct ChipSong bdash_chipsong;
 
 extern const uint32_t clock_spr[];
 extern const uint32_t diams_spr[];
@@ -184,14 +186,13 @@ void handle_rockford(int pos)
 				case bdash_diamond+32 : 
 				case bdash_diamond+48 : 
 					diamonds += 1;
-					play_sample(snd_diam_raw, snd_diam_raw_len, 256, -1,40,40);
-				
+					chip_note(3, 1, 4);
 					vram[pos+v[i][1]] = v[i][2];
 					vram[pos] = bdash_empty;
 					break;
 
 				case bdash_soil : 
-					play_sample(snd_dig1_raw, snd_dig1_raw_len, 256, -1,40,40);
+					chip_note(3, 1, 3);
 					vram[pos+v[i][1]] = v[i][2];
 					vram[pos] = bdash_empty;
 					break;
@@ -203,11 +204,11 @@ void handle_rockford(int pos)
 
 				case bdash_rock : 
 					// _horizontal_ push=> i = 0 or 1 
-					if (i<2 && vram[pos+v[i][1]*2]==bdash_empty) 
-					{
+					if (i<2 && vram[pos+v[i][1]*2]==bdash_empty) {
 						vram[pos] = bdash_empty;
 						vram[pos+v[i][1]]=v[i][2];
 						vram[pos+v[i][1]*2]=bdash_rock;
+						chip_note(3, 1, 5);
 					}
 				break;
 				case bdash_out_open :
@@ -267,16 +268,16 @@ void update_displays(void)
 
 
 void game_frame()
-// memorize only "interesting" pos ?
-
 {
-	kbd_emulate_gamepad();
+	// memorize only "interesting" pos ?
 	gamepad_pressed = gamepad_buttons[0] & ~old_gamepad;
-	static int snd_handle = -1;
 
 	if (level==bdash_start) {
-		if (snd_handle<0) // launch looping sample
+		if (!chip_song_playing())
+			chip_play(&bdash_chipsong);
+		/*if (snd_handle<0) // launch looping sample
 			snd_handle = play_sample(snd_music1_raw, snd_music1_raw_len,250,0, 200,200);
+		*/
 
 		vram[lvl_w*6+10]=bdash_rockford_idle+((vga_frame-32)/16)%4*16;
 		int fr=((vga_frame-32)/8)%16-12;
@@ -290,7 +291,7 @@ void game_frame()
 
 
 		if (gamepad_pressed & (gamepad_A | gamepad_start)) {
-			stop_sample(snd_handle);
+			chip_play(0);
 			start_level(1);
 		}
 		return;
