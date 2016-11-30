@@ -1,20 +1,26 @@
 /* TODO 
+start at last level / choose lvl seen in session
+
 sons
 joystick max shoot
 
+title screens
+pre-scroll level to see rockford
+
 fin level (FX - tt ce qui n'est pas rocher explose, pause et qq temps apres passe niveau suivant)
 rock qui roule : commencer a G de l'ecran, varier les hauteurs a chaque fois 
-temps/diam qui s'agite a la fin
+temps/diam qui s'agite a la fin / SFX
+SFX open door
+
 affiche 
 decalage bg changement ecran
 load levels
 
-start level sound 'warp)'
+start level sound 'warp'
 
 fireflies
-(blob?)
-level design
 pierre tombe sur firefly
+(blob?)
 magic wall ?
 bomb 
 + petits niveaux ?
@@ -28,8 +34,19 @@ bomb
 
 #include "bdash.h"
 
-#define lvl_w 128
-#define lvl_h 64
+
+#define lvl_w 64
+#define lvl_h 32
+
+
+struct Level {
+	char *title;
+	int points, extra; // points per diamond / extra diamond
+	int diamonds; // needed diamonds to end level
+	int time; // seconds
+	char *msg;
+	char map[22*40]; 
+};
 
 extern struct ChipSong bdash_chipsong;
 
@@ -37,27 +54,49 @@ extern const uint32_t clock_spr[];
 extern const uint32_t diams_spr[];
 extern const uint32_t rock_spr[]; // big rock
 
-extern const int8_t snd_diam_raw[], snd_dig1_raw[], snd_music1_raw[];
-extern const unsigned int snd_diam_raw_len, snd_dig1_raw_len, snd_music1_raw_len;
+#include "levels.h" // defines levels[]
 
-const int nb_levels=2;
-const int level_time[] =  {0,150,100};
-const int level_diams[] = {0, 12, 20};
 
 object *bg, *clock, *diams, *rock;
 
 uint8_t vram[lvl_w*lvl_h];
 
 int diamonds, date_death,date_start, level;
+int level_time;
+int level_diams;
+
+
+static const uint8_t lvlmap[]={
+	[' '-' ']=bdash_empty,
+	['W'-' ']=bdash_block2,
+	['w'-' ']=bdash_block,
+	['d'-' ']=bdash_diamond,
+	['.'-' ']=bdash_soil,
+	['r'-' ']=bdash_rock,
+	['X'-' ']=bdash_rockford_idle,
+	['P'-' ']=bdash_out_closed,
+};
+void load_level(int l)
+{
+	const struct Level *lvl=&levels[l];
+	for (int j=0;j<22;j++)
+		for (int i=0;i<40;i++)
+			vram[j*lvl_w+i]=lvlmap[lvl->map[j*40+i]-' '];
+	level_time = lvl->time;
+	level_diams = lvl->diamonds;
+}
 
 void start_level(int l)
 {
 	// load level
 	level = l;
-	memcpy(vram, bdash_tmap[level], sizeof(vram));
-	
+	if (l)
+		load_level(l-1);
+	else  // XXX
+		memcpy(vram, bdash_tmap[level], sizeof(vram));
+
 	date_start = vga_frame;
-	date_death = vga_frame+60*level_time[level]; // time left in seconds
+	date_death = vga_frame+60*level_time; // time left in seconds
 
 	clock->y=level==bdash_start?-30:7; // show or hide clock 
 	diams->y=level==bdash_start?-30:7; // show or hide diams 
@@ -214,7 +253,7 @@ void handle_rockford(int pos)
 				case bdash_out_open :
 					vram[pos]=bdash_empty;
 					// Win ! make a nice animation ...
-					start_level(level<nb_levels?level+1:bdash_start);
+					start_level(level<NB_LEVELS?level+1:bdash_start);
 
 				break;
 			}
@@ -261,8 +300,8 @@ void update_displays(void)
 	}
 
 	// set to frame corresponding to level
-	clock->fr = vga_frame<date_death?(vga_frame-date_start)*9/(level_time[level]*60):8; // clock
-	diams->fr = diamonds<level_diams[level]?diamonds*9/level_diams[level]:8; // diams
+	clock->fr = vga_frame<date_death?(vga_frame-date_start)*9/(level_time*60):8; // clock
+	diams->fr = diamonds<level_diams?diamonds*9/level_diams:8; // diams
 
 }
 
@@ -313,9 +352,12 @@ void game_frame()
 				if (is_rockford(pos+lvl_w))
 					date_death = vga_frame; // die now
 
-				if (!falls(pos, bdash_rock_fall)) // free fall
+				if (!falls(pos, bdash_rock_fall)) {// free fall
 					// if did not move 
 					vram[pos]=bdash_rock;
+					// sfx bump on ground
+					chip_note(3, 1, 5);
+				}
 				break;
 
 
@@ -358,7 +400,7 @@ void game_frame()
 			break;
 
 			case bdash_out_closed : 
-				if (diamonds>=level_diams[level]) 
+				if (diamonds>=level_diams) 
 					vram[pos]=bdash_out_open;
 			break;
 
