@@ -1,7 +1,7 @@
 #testkernel makefile
 NAME = bdash
 
-GAME_C_FILES = main.c lib/blitter/blitter.c lib/blitter/blitter_tmap.c lib/blitter/blitter_sprites.c lib/chiptune/chiptune.c bdash_song.c
+GAME_C_FILES = main.c lib/blitter/blitter.c lib/blitter/blitter_tmap.c lib/blitter/blitter_sprites.c lib/chiptune/chiptune.c lib/chiptune/player.c bdash_song.c
 GAME_BINARY_FILES = bdash.tset bdash.tmap clock.spr diams.spr rock.spr 
 #$(wildcard snd/*.raw) 
 
