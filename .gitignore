@@ -3,4 +3,10 @@ build/*
 
 *.hex
 *.bin
-*_emu
+*_sdl
+*.elf
+*.spr
+*.tmap 
+*.tset 
+*.spr.png
+rock/????_od.png

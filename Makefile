@@ -1,12 +1,13 @@
 #testkernel makefile
 NAME = bdash
 
-GAME_C_FILES = main.c lib/blitter/blitter.c lib/blitter/blitter_tmap.c lib/blitter/blitter_sprites.c lib/chiptune/chiptune.c lib/chiptune/player.c bdash_song.c
+GAME_C_FILES = main.c bdash_song.c
+GAME_C_FILES += lib/blitter/blitter.c lib/blitter/blitter_tmap.c lib/blitter/blitter_sprites.c lib/chiptune/chiptune.c lib/chiptune/player.c
 GAME_BINARY_FILES = bdash.tset bdash.tmap clock.spr diams.spr rock.spr 
 #$(wildcard snd/*.raw) 
 
 include $(BITBOX)/kernel/bitbox.mk
-main.c:bdash.h bdash_song.c
+main.c:bdash.h bdash_song.c 
 
 bdash.h bdash.tset bdash.tmap: bdash.tmx bdash.png 
 	python $(BITBOX)/lib/blitter/scripts/tmx.py bdash.tmx > bdash.h
