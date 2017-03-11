@@ -10,3 +10,6 @@ build/*
 *.tset 
 *.spr.png
 rock/????_od.png
+
+bdash.h
+bdash_song.c
