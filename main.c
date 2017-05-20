@@ -62,7 +62,7 @@ extern const uint32_t rock_spr[]; // big rock
 #include "levels.h" // defines levels[]
 
 
-object *bg, *clock, *diams, *rock;
+object *bg, *xclock, *diams, *rock;
 
 uint8_t vram[lvl_w*lvl_h];
 
@@ -132,7 +132,7 @@ void start_level(int l)
 		date_start = vga_frame;
 		date_death = vga_frame+60*level_time; // time left in seconds
 
-		clock->y=7; // show or hide clock 
+		xclock->y=7; // show or hide clock 
 		diams->y=7; // show or hide diams 
 
 		diamonds= 0;
@@ -147,7 +147,7 @@ void start_level(int l)
 	} else { // title
 		memcpy(vram, bdash_tmap[level], sizeof(vram));
 		bg->x=0;bg->y=0;
-		clock->y=1024; // show or hide clock 
+		xclock->y=1024; // show or hide clock 
 		diams->y=1024; // show or hide diams 
 	}
 
@@ -156,7 +156,7 @@ void start_level(int l)
 void game_init() {
 	blitter_init();
 	bg = tilemap_new(bdash_tset, 0,0, bdash_header, &vram);
-	clock = sprite_new((uint32_t*)&clock_spr, 10, 10, -1);
+	xclock = sprite_new((uint32_t*)&clock_spr, 10, 10, -1);
 
 	diams = sprite_new((uint32_t*)&diams_spr, 50, 10, -1);
 
@@ -400,7 +400,7 @@ void update_displays(void)
 
 	if (vga_frame-date_start<32+32) {
 		t = (vga_frame-date_start-32)/32.f-1.f;
-		clock->y = -40 + (t*t*((os+1)*t + os)+1)*50.; //		(s+1)*t^3 - s*t^2
+		xclock->y = -40 + (t*t*((os+1)*t + os)+1)*50.; //		(s+1)*t^3 - s*t^2
 	}
 	if (vga_frame-date_start<32+64) {
 		t = (vga_frame-date_start-64)/32.f-1.f;
@@ -408,7 +408,7 @@ void update_displays(void)
 	}
 
 	// set to frame corresponding to level
-	clock->fr = vga_frame<date_death?(vga_frame-date_start)*9/(level_time*60):8; // clock
+	xclock->fr = vga_frame<date_death?(vga_frame-date_start)*9/(level_time*60):8; // clock
 	diams->fr = diamonds<level_diams?diamonds*9/level_diams:8; // diams
 
 }
