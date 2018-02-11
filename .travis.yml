@@ -2,16 +2,16 @@
 sudo: required
 dist: trusty
 
-language: c 
+language: c
 before_script:
-  - git clone https://github.com/makapuf/bitbox.git 
+  - git clone https://github.com/makapuf/bitbox.git
 
   - sudo apt-get -qq update
-  - sudo apt-get -qq install gcc-arm-none-eabi libsdl1.2-dev 
-  - pip install Pillow
+  - sudo apt-get -qq install gcc-arm-none-eabi libsdl1.2-dev
+  - pip install --user Pillow
 
   # check it worked
-  - arm-none-eabi-gcc --version 
+  - arm-none-eabi-gcc --version
   - gcc --version
 
 script:
